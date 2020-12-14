@@ -111,12 +111,6 @@ const test = [
     "L.LLLLL.LL",
 ];
 
-// for (let i = 0; i < test.length; i++) {
-//     const element = test[i];
-//     console.log(element);
-// }
-// console.log("-".repeat(test[0].length));
-
 const findNeighbours = (seats, position) => {
     const [x, y] = position;
     const neighbours = [];
@@ -234,23 +228,10 @@ const iterateSeen = (currentState, prevState = [], iterations = 0) => {
     return iterateSeen(reJoined, currentState, iterations + 1);
 };
 
-// console.log(iterateSeen(test));
-
-const res = iterateSeen(input);
-// for (let i = 0; i < res.length; i++) {
-//     const element = res[i];
-//     console.log(element);
-// }
+const result = iterateSeen(input);
 console.log(
-    res
+    result
         .join("")
         .split("")
         .filter(ch => ch === "#").length
 );
-
-// const res2 = iterate(res);
-// for (let i = 0; i < res2.length; i++) {
-//     const element = res2[i];
-//     console.log(element);
-// }
-// console.log("-".repeat(res2[0].length));
