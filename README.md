@@ -1,0 +1,3 @@
+# Advent of Code 2020
+
+Just some crappy code, I guess...
