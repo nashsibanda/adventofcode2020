@@ -182,7 +182,7 @@ const input = [
     ["mem", 6845, 26007],
     ["mask", "10011X00011011X1101X00X001X1X001X111"],
     ["mem", 49101, 13289],
-    ["mem", 32, 91365],
+    ["mem", 32, 391365],
     ["mem", 31906, 79],
     ["mem", 48744, 71043],
     ["mask", "1001X0X00010100110X001011001101X01X0"],
@@ -494,7 +494,7 @@ const input = [
     ["mem", 8596, 30400],
     ["mask", "1000101XX0X0X1110110111X110011X00110"],
     ["mem", 919, 32148],
-    ["mem", 41, 53324],
+    ["mem", 41, 453324],
     ["mem", 36794, 179133],
     ["mem", 2780, 958033590],
     ["mask", "100010X1X11011110010X01101101110X100"],
@@ -600,6 +600,13 @@ const test = [
     ["mem", 8, 0],
 ];
 
+const testTwo = [
+    ["mask", "000000000000000000000000000000X1001X"],
+    ["mem", 42, 100],
+    ["mask", "00000000000000000000000000000000X0XX"],
+    ["mem", 26, 1],
+];
+
 const bitmask = (value, mask) => {
     const split = value.split("");
     for (let i = 0; i < mask.length; i++) {
@@ -626,7 +633,6 @@ const masker = program => {
             const padding = "0".repeat(36 - binary.length);
             const paddedBin = padding + binary;
             memory[element[1]] = parseInt(bitmask(paddedBin, mask), 2);
-            console.log(memory[element[1]]);
         }
     }
 
@@ -638,4 +644,61 @@ const masker = program => {
     return sumOfMemory;
 };
 
-console.log(masker(test));
+const getAddresses = (address, mask) => {
+    let addrStrings = [""];
+
+    for (let i = 0; i < mask.length; i++) {
+        const digit = mask[i];
+        if (digit === "X") {
+            const floaters = [];
+            for (let j = 0; j < addrStrings.length; j++) {
+                const str = addrStrings[j];
+                addrStrings[j] = str + "1";
+                floaters.push(str + "0");
+            }
+            addrStrings.push(...floaters);
+        } else if (digit === "1") {
+            for (let j = 0; j < addrStrings.length; j++) {
+                const str = addrStrings[j];
+                addrStrings[j] = str + "1";
+            }
+        } else {
+            for (let j = 0; j < addrStrings.length; j++) {
+                const str = addrStrings[j];
+                addrStrings[j] = str + address[i];
+            }
+        }
+    }
+
+    return addrStrings.map(str => parseInt(str, 2));
+};
+
+const reAddresser = program => {
+    const memory = {};
+    let mask;
+
+    for (let i = 0; i < program.length; i++) {
+        const element = program[i];
+        if (element[0] === "mask") {
+            mask = element[1];
+        } else if (element[0] === "mem") {
+            const binaryAddr = element[1].toString(2);
+            const padding = "0".repeat(36 - binaryAddr.length);
+            const paddedBinAddr = padding + binaryAddr;
+            const newAddresses = getAddresses(paddedBinAddr, mask);
+            for (let i = 0; i < newAddresses.length; i++) {
+                const address = newAddresses[i];
+                memory[address] = element[2];
+            }
+        }
+    }
+
+    const sumOfMemory = Object.values(memory).reduce(
+        (cur, acc) => cur + acc,
+        0
+    );
+
+    return sumOfMemory;
+};
+
+console.log(reAddresser(input));
